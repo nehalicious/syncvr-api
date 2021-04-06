@@ -1,6 +1,14 @@
 import {Response} from "express";
 import {db} from './config/firebase'
-
+/**
+ * Optimal solution would be:
+ * 1. Query firestore to get the largest fibonacci numbers computer so far [x-1], [x]
+ * 2. When asked to find fibonacci number at nth position, if n has not already been calculated,
+ * calculate all fibonacci numbers from [x+1] ... [n-1] and store them (with access time = null
+ * 3. Return the fibonacci number calculated at place 'n'
+ * This way, if the user tries to find a number at any position before 'n',
+ * he an query it without having to calculate it all over again
+ */
 
 /**
  * Num = index of the fibonacci number (count starting from 1)
@@ -21,6 +29,7 @@ const calculateFibonacci = async (num: number) => {
   return numbers[num-1]
 };
 
+
 type EntryType = {
   index: number
 }
@@ -33,13 +42,12 @@ const getFibonacci = async (req: Request, res: Response) => {
   const { index } = req.body;
 
   try {
-    //if this number has already been calculated, retrieve it and return
-    const fib_number = await db.collection('fibonacci').where('id', '==', index).get();
+    //if this number has already been calculated, retrieve it and update access time
+    const fib_number = await db.collection('fibonacci').doc(index.toString()).get();
     let entryObject = {};
-    if(!fib_number.empty) {
+    if(fib_number.exists) {
       // @ts-ignore
-      //desgined in a way that each id only appears once, so can safely take the 0 index element
-      entryObject = {value: fib_number[0].data().value, access_time:Date.now()}
+      entryObject = {value: fib_number.data().value, access_time:Date.now()}
     } else {
       //if this number has not already been calculated, calculate it
       entryObject = {
@@ -49,7 +57,7 @@ const getFibonacci = async (req: Request, res: Response) => {
     }
 
     //update and store the access time
-    await db.collection('fibonacci').doc().set(entryObject);
+    await db.collection('fibonacci').doc(index.toString()).set(entryObject);
 
     res.status(200).send({
       status: 'success',

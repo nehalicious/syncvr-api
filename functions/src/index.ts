@@ -11,7 +11,7 @@ app.use(express.urlencoded());
 
 // app.use(cors());
 app.use(cors({
-  origin: 'http://localhost:3000'
+  origin: 'https://syncvr-fc5d5.web.app'
 }));
 
 app.get('/', (req, res) => res.status(200).send('Hey there!'));
