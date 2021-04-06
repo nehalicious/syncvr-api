@@ -1,5 +1,6 @@
 import {Response} from "express";
-import { db } from './config/firebase'
+import {db} from './config/firebase'
+
 
 /**
  * Num = index of the fibonacci number (count starting from 1)
@@ -18,7 +19,6 @@ const calculateFibonacci = async (num: number) => {
     numbers[i] = numbers[i-1] + numbers[i-2]
   }
   return numbers[num-1]
-
 };
 
 type EntryType = {
@@ -32,8 +32,6 @@ type Request = {
 const getFibonacci = async (req: Request, res: Response) => {
   const { index } = req.body;
   const key = new Number(index);
-
-
   try {
 
     //if this number has already been calculated, retrieve it and return
