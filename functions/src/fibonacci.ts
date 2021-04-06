@@ -21,10 +21,10 @@ const calculateFibonacci = (num: number) => {
     return 1;
   }
 
-  let numbers: number[] = new Array(num);
-  numbers[0] = 0;
+  let numbers: number[] = new Array(num).fill(1);
+  numbers[0] = 1;
   numbers[1] = 1;
-  for(let i = 2; i<numbers.length; i++) {
+  for(let i = 2; i<num; i++) {
     numbers[i] = numbers[i-1] + numbers[i-2]
   }
   return numbers[num-1]
