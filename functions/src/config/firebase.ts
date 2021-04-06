@@ -7,7 +7,8 @@ admin.initializeApp({
     projectId: functions.config().project.id,
     clientEmail: functions.config().client.email
   }),
-  databaseURL: 'https://syncvr-fc5d5.firebaseio.com'
+  // databaseURL: 'https://syncvr-fc5d5.firebaseio.com'
+  databaseURL: 'https://syncvr-fc5d5-default-rtdb.europe-west1.firebasedatabase.app'
 })
 
 const db = admin.firestore()
