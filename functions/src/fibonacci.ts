@@ -1,15 +1,6 @@
 import {Response} from "express";
 import { db } from './config/firebase'
 
-type Fib = {
-  index: number
-}
-
-type Request = {
-  body: Fib,
-  params: { entryId: string }
-}
-
 /**
  * Num = index of the fibonacci number (count starting from 1)
  */
@@ -30,16 +21,24 @@ const calculateFibonacci = (num: number) => {
 
 };
 
+type EntryType = {
+  index: number
+}
+
+type Request = {
+  body: EntryType,
+}
+
 const getFibonacci = async (req: Request, res: Response) => {
-  const { index } = req.body;
+  const {index} = req.body;
   try {
-    const entry = db.collection('fibonacci').doc()
+    // const entry = db.collection('fibonacci').doc()
     const entryObject = {
       id: index,
       value: calculateFibonacci(index)
     };
 
-    await entry.set(entryObject)
+    await db.collection('fibonacci').doc(index.toString()).set(entryObject);
 
     res.status(200).send({
       status: 'success',
