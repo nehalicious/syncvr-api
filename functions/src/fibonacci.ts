@@ -39,7 +39,7 @@ const getFibonacci = async (req: Request, res: Response) => {
     if(!fib_number.empty) {
       // @ts-ignore
       //desgined in a way that each id only appears once, so can safely take the 0 index element
-      entryObject = {value: fib_number[0].data().value, access_time=Date.now()}
+      entryObject = {value: fib_number[0].data().value, access_time:Date.now()}
     } else {
       //if this number has not already been calculated, calculate it
       entryObject = {
