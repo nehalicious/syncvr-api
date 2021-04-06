@@ -4,7 +4,7 @@ import { db } from './config/firebase'
 /**
  * Num = index of the fibonacci number (count starting from 1)
  */
-const calculateFibonacci = (num: number) => {
+const calculateFibonacci = async (num: number) => {
   if(num == 1){
     return 0;
   } else if (num==2){
@@ -30,14 +30,27 @@ type Request = {
 }
 
 const getFibonacci = async (req: Request, res: Response) => {
-  const {index} = req.body;
-  try {
-    // const entry = db.collection('fibonacci').doc()
-    const entryObject = {
-      id: index,
-      value: calculateFibonacci(index)
-    };
+  const { index } = req.body;
+  const key = new Number(index);
 
+
+  try {
+
+    //if this number has already been calculated, retrieve it and return
+    const fib_number = await db.collection('fibonacci').doc(key.toString()).get();
+    let entryObject = {}
+    if(fib_number.exists) {
+      // @ts-ignore
+      entryObject = {value: fib_number.data().value, access_time=Date.now()}
+    } else {
+      //if this number has not already been calculated, calculate it
+      entryObject = {
+        value: calculateFibonacci(index),
+        access_time: Date.now()
+      };
+    }
+
+    //update and store the access time
     await db.collection('fibonacci').doc(index.toString()).set(entryObject);
 
     res.status(200).send({
@@ -46,7 +59,7 @@ const getFibonacci = async (req: Request, res: Response) => {
       data: entryObject
     })
   } catch(error) {
-      res.status(500).json(error.message)
+    res.status(500).json(error.message)
   }
 };
 
