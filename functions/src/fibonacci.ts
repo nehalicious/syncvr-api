@@ -1,5 +1,6 @@
 import {Response} from "express";
-import {db} from './config/firebase'
+import {db, admin} from './config/firebase'
+
 /**
  * Optimal solution would be:
  * 1. Query firestore to get the largest fibonacci numbers computer so far [x-1], [x]
@@ -13,14 +14,14 @@ import {db} from './config/firebase'
 /**
  * Num = index of the fibonacci number (count starting from 1)
  */
-const calculateFibonacci = async (num: number) => {
+const calculateFibonacci = (num: number) => {
   if(num == 1){
-    return 0;
+    return 1;
   } else if (num==2){
     return 1;
   }
 
-  const numbers: number[] = new Array(num);
+  let numbers: number[] = new Array(num);
   numbers[0] = 0;
   numbers[1] = 1;
   for(let i = 2; i<numbers.length; i++) {
@@ -40,6 +41,7 @@ type Request = {
 
 const getFibonacci = async (req: Request, res: Response) => {
   const { index } = req.body;
+  const FieldValue = admin.firestore.FieldValue;
 
   try {
     //if this number has already been calculated, retrieve it and update access time
@@ -47,13 +49,13 @@ const getFibonacci = async (req: Request, res: Response) => {
     let entryObject = {};
     if(fib_number.exists) {
       // @ts-ignore
-      entryObject = {index: index, value: fib_number.data().value, access_time:Date.now()}
+      entryObject = {index: index, value: fib_number.data().value, access_time:FieldValue.serverTimestamp()}
     } else {
       //if this number has not already been calculated, calculate it
       entryObject = {
         index: index,
         value: calculateFibonacci(index),
-        access_time: Date.now()
+        access_time: FieldValue.serverTimestamp()
       };
     }
 
