@@ -1,36 +1,54 @@
-import { Response } from 'express'
+import {Response} from "express";
 import { db } from './config/firebase'
 
-type Request = {
-  params: { num: number }
+type Fib = {
+  index: number
 }
 
-// const calculate = async(num: number) => {
-//   const x= await db.collection('fibonacci').doc("1").get()
-//   return x.data();
-// };
+type Request = {
+  body: Fib,
+  params: { entryId: string }
+}
 
+/**
+ * Num = index of the fibonacci number (count starting from 1)
+ */
+const calculateFibonacci = (num: number) => {
+  if(num == 1){
+    return 0;
+  } else if (num==2){
+    return 1;
+  }
+
+  const numbers: number[] = new Array(num);
+  numbers[0] = 0;
+  numbers[1] = 1;
+  for(let i = 2; i<numbers.length; i++) {
+    numbers[i] = numbers[i-1] + numbers[i-2]
+  }
+  return numbers[num-1]
+
+};
 
 const getFibonacci = async (req: Request, res: Response) => {
+  const { index } = req.body;
   try {
-    const { num } = req.params;
-    let x = Number(num);
-    let fib_number = await db.collection('fibonacci').doc(x.toString()).get();
+    const entry = db.collection('fibonacci').doc()
+    const entryObject = {
+      id: index,
+      value: calculateFibonacci(index)
+    };
 
-    if(!fib_number.exists) {
-      // const calculated = calculate(num);
-      // return res.status(200).json(calculated)
-      const allEntries = await db.collection('fibonacci').get();
-      return res.status(200).json(allEntries.docs)
-    }
+    await entry.set(entryObject)
 
-    return res.status(200).json(
-        fib_number.data()
-    )
-
+    res.status(200).send({
+      status: 'success',
+      message: 'entry added successfully',
+      data: entryObject
+    })
   } catch(error) {
-    return res.status(500).json(error.message)
+      res.status(500).json(error.message)
   }
 };
 
-export { getFibonacci }
+export {getFibonacci}

@@ -8,13 +8,13 @@ const app = express();
 
 app.use(cors());
 app.use(cors({
-  origin: 'https://syncvr-fc5d5.web.app/'
+  origin: 'https://syncvr-fc5d5.web.app'
 }));
 
 app.get('/', (req, res) => res.status(200).send('Hey there!'));
 // @ts-ignore
 app.get('/requests', getAllRequests);
-app.get('/fibonacci/:num', getFibonacci);
+app.post('/fibonacci/', getFibonacci);
 
 
 exports.app = functions.https.onRequest(app)
