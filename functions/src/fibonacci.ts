@@ -47,10 +47,11 @@ const getFibonacci = async (req: Request, res: Response) => {
     let entryObject = {};
     if(fib_number.exists) {
       // @ts-ignore
-      entryObject = {value: fib_number.data().value, access_time:Date.now()}
+      entryObject = {index: index, value: fib_number.data().value, access_time:Date.now()}
     } else {
       //if this number has not already been calculated, calculate it
       entryObject = {
+        index: index,
         value: calculateFibonacci(index),
         access_time: Date.now()
       };
